@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 
 // getting the user model
 const {User}  = require('../database/Schema');
-console.log(User)
+
 
 const router = express.Router();
 
