@@ -65,15 +65,12 @@ router.post('/signup',async function(req,res){
             res.status(200).json({
                 msg:"user created successfully",
                 token,
-                userId:user._id,
-                account
             })
         }
         catch(err){
             console.log(err)
             res.status(500).json({
                 msg: "Intrenal server error",
-                err
             })
         }
 
@@ -124,8 +121,7 @@ router.post('/signin', async function(req,res){
         },JWT_SECRET);
 
         res.status(200).json({
-            msg: "Login Successfull",
-            username:findUser.username,
+            msg: "Login Successfully",
             token:token
         })
     }
@@ -135,8 +131,6 @@ router.post('/signin', async function(req,res){
         })
     }
     
-
-
 })
 
 module.exports = router;

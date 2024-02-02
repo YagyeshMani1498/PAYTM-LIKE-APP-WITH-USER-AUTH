@@ -1,4 +1,4 @@
-const JWT_SECRET = require("./config");
+const {JWT_SECRET} = require("./config");
 const jwt = require('jsonwebtoken');
 
 const authorize =  function (req,res,next){
@@ -7,7 +7,7 @@ const authorize =  function (req,res,next){
 
         if(!auth || !auth.startsWith("Bearer ")){
             return res.status(401).json({
-            msg:"Invalid token!"
+            msg:"Invalid token! if not starts with"
         })
         }
 
@@ -15,19 +15,20 @@ const authorize =  function (req,res,next){
         
         try{
             const decode =  jwt.verify(token,JWT_SECRET);
-
             if(decode.userId && decode.username){
-                req.user = decode;
+                req.userId = decode.userId;
+                req.username = decode.username;
                 next();
             }else {
                 return res.status(403).json({
-                    msg:"Invalid request"
+                    msg:"Invalid request not decode"
                 })
             }
         }
         catch(err){
             return res.status(401).json({
-                msg:"Invalid request"
+                msg:"Invalid request if err",
+                err,
             })
         }
 
