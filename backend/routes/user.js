@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
 // getting the user model
-const {User}  = require('../database/Schema');
+const {User,Account}  = require('../database/Schema');
 const {JWT_SECRET} = require("../config")
 
 const router = express.Router();
@@ -50,6 +50,13 @@ router.post('/signup',async function(req,res){
                 lastName:req.body.lastName,
             });
 
+
+            const account =  await Account.create({
+                userId:user._id,
+                balance:parseFloat((Math.random()*10000 +1).toFixed(2))
+            })
+
+            
             const token = jwt.sign({
                 userId:user._id,
                 username:user.username
@@ -58,7 +65,8 @@ router.post('/signup',async function(req,res){
             res.status(200).json({
                 msg:"user created successfully",
                 token,
-                userId:user._id
+                userId:user._id,
+                account
             })
         }
         catch(err){
