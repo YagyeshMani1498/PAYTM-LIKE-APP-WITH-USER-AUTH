@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 require('dotenv').config()
 
-const dbUrl = process.env.DB_URL+"Paytm"
+const dbUrl = process.env.DB_URL+"PaytmApp"
 
 const dbConnect = async function(){
     try {
