@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;500;700&display=swap');
+
 /*
   1. Use a more-intuitive box-sizing model.
 */
@@ -46,4 +48,111 @@
     isolation: isolate;
   }
 
+html,body {
+  min-width: 100%;
+  min-height: 100vh;
+}
+
+:root {
+  --primary-0:#021224;
+  --primary-1: #1f2c3ce0;
+  --primary-2: #1f2c3c;
+  --secondary:#7e858a;
+  --tertiary: #b0b3b3;
+  --white:#fff;
+  --fw-b:700;
+  --fw-m:500;
+}
+
+body {
+  background-color: rgb(174, 174, 232);
+  font-family: 'Roboto Condensed', sans-serif;
+  display: grid;
+  place-items: center;
+  color: var(--primary-0);
+}
+
+
+.sign-up-in-box {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--white);
+  align-items: center;
+  padding: 1.5rem 1rem;
+  border-radius: 0.6rem;
+  width: 18rem;
+}
+
+.heading {
+  font-weight: var(--fw-b);
+  margin-bottom: 0.2rem;
+}
+
+.sub-heading {
+  max-width: 28ch;
+  text-align: center;
+  line-height: 1;
+  font-size: 0.9rem;
+  color: var(--secondary);
+  margin-bottom: 1rem;
+}
+
+.input-box {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+ .label {
+  font-size: 0.8rem;
+  font-weight: var(--fw-m);
+  line-height: 0.9;
+  margin-bottom: 0.4rem;
+}
+
+.input-field {
+  padding: 0.2rem;
+  border: 1px solid rgba(218, 238, 247, 0.719);
+  border-radius: 0.3rem;
   
+}
+
+.input-field:focus {
+  outline-color: rgb(5, 31, 57);
+}
+
+::placeholder {
+  color: var(--tertiary);
+  font-size: 0.9rem;
+}
+
+
+.btn {
+  align-self: stretch;
+  border: none;
+  background-color: var(--primary-1);
+  color: var(--white);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  margin-bottom: 0.3rem;
+}
+
+.btn:hover{
+  background-color: var(--primary-2);
+}
+
+.bottom-warning {
+  font-size: 0.85rem;
+}
+
+.link{
+  font-weight: var(--fw-m);
+  color: var(--primary-0);
+  text-decoration: 2px underline;
+}
+
+.link:hover{
+  text-decoration: none;
+}

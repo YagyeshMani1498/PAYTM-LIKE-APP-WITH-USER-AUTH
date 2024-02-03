@@ -1,4 +1,5 @@
 const express  = require("express"); 
+const z = require('zod')
 const authMiddleware = require('../middleware');
 const { Account } = require("../database/Schema");
 const mongoose = require('mongoose')
@@ -24,8 +25,25 @@ router.get("/balance",authMiddleware, async function(req,res){
 
 // to transfer money 
 
+const transferBody = z.object({
+    toUser: z.string(),
+    amount: z.number(),
+  })
+  
+
 router.post("/transfer", authMiddleware, async function(req,res){
-    const session = mongoose.startSession();
+
+    const {success} = transferBody.safeParse(req.body)
+
+    if (!success) {
+        return res.status(400).json({
+        message: 'Invalid request',
+    })
+  }
+
+
+   try{
+    const session = await mongoose.startSession();
 
     session.startTransaction();
     const {amount,toUser} = req.body;
@@ -60,6 +78,14 @@ router.post("/transfer", authMiddleware, async function(req,res){
     res.status(200).json({
         msg: "Transaction successfully"
     })
+   }
+   catch(err){
+    console.log(err)
+    res.status(500).json({
+        msg:"somthing went wrong while sending the money",
+        err:err
+    })
+   }
 })
 
 module.exports = router;
