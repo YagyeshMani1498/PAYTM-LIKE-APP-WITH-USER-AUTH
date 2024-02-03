@@ -1,26 +1,23 @@
-import {BrowserRouter,Route,Routes} from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Singup } from "./differentPages/Signup";
 import { Singin } from "./differentPages/Signin";
 import { Dashboard } from "./differentPages/Dashboard";
 import { SendMoney } from "./differentPages/SendMoney";
 
-
 function App() {
-
   return (
     <>
-    
-        <BrowserRouter>
+      <BrowserRouter>
         <Routes>
-          <Route path="/signup" element={<Singup/>}/>
-          <Route path="/signin" element={<Singin/>}/>
-          <Route path="/dashboard" element ={<Dashboard/>}/>
-          <Route path="/send" element={<SendMoney/>}/>
+          <Route path="/" element={<Singup />} />
+          <Route path="/signin" element={<Singin />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/send" element={<SendMoney />} />
         </Routes>
-        </BrowserRouter>
+      </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

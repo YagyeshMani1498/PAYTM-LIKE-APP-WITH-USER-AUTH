@@ -1,136 +1,172 @@
-const express = require('express');
+const express = require("express");
 
-const z = require('zod');
+const authMiddleware = require("../middleware");
 
-const jwt = require('jsonwebtoken');
+const z = require("zod");
 
-const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
+
+const bcrypt = require("bcryptjs");
 
 // getting the user model
-const {User,Account}  = require('../database/Schema');
-const {JWT_SECRET} = require("../config")
+const { User, Account } = require("../database/Schema");
+const { JWT_SECRET } = require("../config");
 
 const router = express.Router();
 
 // SIGNUP ROUTE
 
 const signupValidationSchema = z.object({
-    username:z.string().email(),
-    password:z.string().min(8),
-    firstName:z.string(),
-    lastName:z.string()
-})
+  username: z.string().email(),
+  password: z.string().min(8),
+  firstName: z.string().min(4),
+  lastName: z.string().min(8),
+});
 
-router.post('/signup',async function(req,res){
+router.post("/signup", async function (req, res) {
+  const { success } = signupValidationSchema.safeParse(req.body);
 
-    const {success} = signupValidationSchema.safeParse(req.body);
+  if (!success) {
+    return res.json({
+      msg: "invalid input",
+    });
+  }
 
-    if(!success){
-        return res.status(201).json({
-            msg:"Invalid Input"
-        })
-    }
+  const existingUser = await User.findOne({ username: req.body.username });
 
-    const existingUser = await User.findOne({username:req.body.username});
+  if (existingUser) {
+    return res.json({
+      msg: "username already taken!",
+    });
+  }
 
-    if(existingUser){
-        return res.status(201).json({
-            msg:"username already taken!"
-        })
-    }
+  try {
+    const hashPassword = await bcrypt.hash(req.body.password, 10);
 
     try {
-        const hashPassword = await bcrypt.hash(req.body.password,10);
+      const user = await User.create({
+        username: req.body.username,
+        password: hashPassword,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+      });
 
-        try{
-            const user = await User.create({
-                username:req.body.username,
-                password:hashPassword,
-                firstName:req.body.firstName,
-                lastName:req.body.lastName,
-            });
+      const account = await Account.create({
+        userId: user._id,
+        balance: parseFloat((Math.random() * 10000 + 1).toFixed(2)),
+      });
 
+      // const token = jwt.sign(
+      //   {
+      //     userId: user._id,
+      //     username: user.username,
+      //   },
+      //   JWT_SECRET
+      // );
 
-            const account =  await Account.create({
-                userId:user._id,
-                balance:parseFloat((Math.random()*10000 +1).toFixed(2))
-            })
-
-            
-            const token = jwt.sign({
-                userId:user._id,
-                username:user.username
-            },JWT_SECRET)
-
-            res.status(200).json({
-                msg:"user created successfully",
-                token,
-            })
-        }
-        catch(err){
-            console.log(err)
-            res.status(500).json({
-                msg: "Intrenal server error",
-            })
-        }
-
+      res.status(200).json({
+        msg: "user created successfully",
+        // token,
+      });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({
+        msg: "Intrenal server error",
+      });
     }
-    catch(err){
-        return res.status(201).json({
-            msg:"password could not be encrypted!"
-        })
-    }
-
-})
+  } catch (err) {
+    return res.status(201).json({
+      msg: "password could not be encrypted!",
+    });
+  }
+});
 
 // SIGNIN ROUTE
 
 const signinValidationSchema = z.object({
-    username:z.string().email(),
-    password:z.string().min(8)
-})
+  username: z.string().email(),
+  password: z.string().min(8),
+});
 
-router.post('/signin', async function(req,res){
-    const {success} = signinValidationSchema.safeParse(req.body);
+router.post("/signin", async function (req, res) {
+  const { success } = signinValidationSchema.safeParse(req.body);
 
-    if(!success){
-        return res.status(201).json({
-            msg:"Invalid Input"
-        })
-    };
+  if (!success) {
+    return res.status(201).json({
+      msg: "Invalid Input",
+    });
+  }
 
-    try {
-        const findUser = await User.findOne({username:req.body.username});
+  try {
+    const findUser = await User.findOne({ username: req.body.username });
 
-        if(!findUser) return res.status(201).json({
-            msg:"Username not found"
-        })
-            
-        let passwordMatch = await bcrypt.compare(req.body.password,findUser.password);
-        if(!passwordMatch){
-            return res.status(400).json({
-                msg:"Password does not match"
-            })
-        }
+    if (!findUser)
+      return res.status(201).json({
+        msg: "Username not found",
+      });
 
-        // CREAte jwt token,
-
-        const token = jwt.sign({
-            userId:findUser._id,
-            username:findUser.username
-        },JWT_SECRET);
-
-        res.status(200).json({
-            msg: "Login Successfully",
-            token:token
-        })
+    let passwordMatch = await bcrypt.compare(
+      req.body.password,
+      findUser.password
+    );
+    if (!passwordMatch) {
+      return res.status(400).json({
+        msg: "Password does not match",
+      });
     }
-    catch(err){
-        res.status(500).json({
-            err,
-        })
-    }
-    
-})
+
+    // CREAte jwt token,
+
+    const token = jwt.sign(
+      {
+        userId: findUser._id,
+        username: findUser.username,
+      },
+      JWT_SECRET
+    );
+
+    res.status(200).json({
+      msg: "Login Successfully",
+      token: token,
+      firstName: findUser.firstName,
+    });
+  } catch (err) {
+    res.status(500).json({
+      err,
+    });
+  }
+});
+
+// get users
+
+router.get("/bulk", async function (req, res) {
+  const filter = req.query.filter || "";
+
+  const users = await User.find({
+    $or: [
+      {
+        firstName: {
+          $regex: filter,
+        },
+      },
+      {
+        lastName: {
+          $regex: filter,
+        },
+      },
+    ],
+  });
+
+  res.status(200).json({
+    users: users.map((user) => {
+      return {
+        username: user.username,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        _id: user._id,
+      };
+    }),
+  });
+});
 
 module.exports = router;
