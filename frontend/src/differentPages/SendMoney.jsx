@@ -26,6 +26,7 @@ export function SendMoney({ toast }) {
       )
       .then(function (response) {
         response.status === 200 && toast.success("Transaction Successfull");
+        console.log(response.data.firstName);
         setInputValue("");
       })
       .catch(function (error) {
