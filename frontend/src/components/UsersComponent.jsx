@@ -4,14 +4,18 @@ import axios from "axios";
 
 /* eslint-disable react/prop-types */
 export function UsersComponent() {
-  const [inputValue, setInputValue] = useState("");
+  const [inputValue, setInputValue] = useState("ntiestnisrtn");
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   let timerId;
 
   function handleChange(e) {
-    setInputValue(e.target.value);
+    if (e.target.value === "") {
+      setInputValue("tniersntufytnesntnrit");
+    } else {
+      setInputValue(e.target.value);
+    }
   }
 
   // changing state of inputvalue after a certain time of inactivity....
@@ -57,9 +61,7 @@ export function UsersComponent() {
         />
       </div>
       <div className="user-display-field">
-        {users.length === 0 ? (
-          <p>{`No user with the name: ${inputValue}`}</p>
-        ) : null}
+        {users.length === 0 ? <p>{`Input a name or character`}</p> : null}
         {users.map((user) => {
           return (
             <div key={user._id} className="user">
