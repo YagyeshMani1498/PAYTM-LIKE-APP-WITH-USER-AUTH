@@ -19,7 +19,7 @@ export function Singup({ toast }) {
   function requestSignup(toast) {
     axios
       .post(
-        "https://congenial-spork-45vxjvq4v44hqjx6-3000.app.github.dev/api/v1/user/signup",
+        "https://paytm-like-app-with-user-auth.onrender.com/api/v1/user/signup",
         {
           firstName,
           lastName,

@@ -13,7 +13,7 @@ export function SendMoney({ toast }) {
   function transferMoney() {
     axios
       .post(
-        "https://congenial-spork-45vxjvq4v44hqjx6-3000.app.github.dev/api/v1/account/transfer",
+        "https://paytm-like-app-with-user-auth.onrender.com/api/v1/account/transfer",
         {
           toUser: `${id}`,
           amount: parseFloat(inputValue),

@@ -6,7 +6,7 @@ export function BalanceComponent({ showBalance }) {
   async function checkBalance() {
     const token = localStorage.getItem("JWT-Token");
     const response = await axios.get(
-      "https://congenial-spork-45vxjvq4v44hqjx6-3000.app.github.dev/api/v1/account/balance",
+      "https://paytm-like-app-with-user-auth.onrender.com/api/v1/account/balance",
       {
         headers: {
           Authorization: "Bearer " + token,
