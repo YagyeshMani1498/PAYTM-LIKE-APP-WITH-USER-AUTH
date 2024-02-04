@@ -8,7 +8,6 @@ export function SendMoney({ toast }) {
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const name = searchParams.get("name");
-
   const [inputValue, setInputValue] = useState("");
 
   function transferMoney() {
@@ -27,6 +26,7 @@ export function SendMoney({ toast }) {
       )
       .then(function (response) {
         response.status === 200 && toast.success("Transaction Successfull");
+        setInputValue("");
       })
       .catch(function (error) {
         error.response.status === 400
@@ -55,6 +55,7 @@ export function SendMoney({ toast }) {
           placeholder="Rs."
           className="input-field send-money-input-field"
           min={0}
+          value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
         />
 
