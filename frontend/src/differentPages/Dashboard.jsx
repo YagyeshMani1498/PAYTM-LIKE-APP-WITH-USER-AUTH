@@ -6,7 +6,7 @@ import { useSearchParams } from "react-router-dom";
 
 export function Dashboard() {
   function showBalance(balance) {
-    toast(`Available balance: Rs ${balance}`);
+    toast(`${balance}`);
   }
 
   const [searchParams] = useSearchParams();

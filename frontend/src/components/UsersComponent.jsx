@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 /* eslint-disable react/prop-types */
 export function UsersComponent() {
@@ -7,14 +8,39 @@ export function UsersComponent() {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
+  let timerId;
+
+  function handleChange(e) {
+    setInputValue(e.target.value);
+  }
+
+  // changing state of inputvalue after a certain time of inactivity....
+  function dbounce(e, func, timer = 1000) {
+    clearInterval(timerId);
+    timerId = setTimeout(() => {
+      func(e);
+    }, timer);
+  }
+
   useEffect(() => {
-    fetch(
-      "https://congenial-spork-45vxjvq4v44hqjx6-3000.app.github.dev/api/v1/user/bulk?filter=" +
-        `${inputValue}`
-    ).then(async (responce) => {
-      const data = await responce.json();
-      setUsers(data.users);
-    });
+    // getting the token from local storage;
+    const token = localStorage.getItem("JWT-Token");
+    axios
+      .get(
+        "https://congenial-spork-45vxjvq4v44hqjx6-3000.app.github.dev/api/v1/user/bulk?filter=" +
+          inputValue,
+        {
+          headers: {
+            Authorization: "Bearer " + token,
+          },
+        }
+      )
+      .then(function (response) {
+        setUsers(response.data.users);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }, [inputValue]);
 
   return (
@@ -25,10 +51,15 @@ export function UsersComponent() {
           type="text"
           placeholder="Search users..."
           className="input-field search-field"
-          onChange={(e) => setInputValue(e.target.value)}
+          // onchange call debounce function.
+          onChange={(e) => dbounce(e, handleChange, 1000)}
+          // *********************************
         />
       </div>
       <div className="user-display-field">
+        {users.length === 0 ? (
+          <p>{`No user with the name: ${inputValue}`}</p>
+        ) : null}
         {users.map((user) => {
           return (
             <div key={user._id} className="user">

@@ -19,23 +19,24 @@ const router = express.Router();
 const signupValidationSchema = z.object({
   username: z.string().email(),
   password: z.string().min(8),
-  firstName: z.string().min(4),
-  lastName: z.string().min(8),
+  firstName: z.string().min(5),
+  lastName: z.string().min(5),
 });
 
 router.post("/signup", async function (req, res) {
-  const { success } = signupValidationSchema.safeParse(req.body);
-
+  const validation = signupValidationSchema.safeParse(req.body);
+  const { success } = validation;
   if (!success) {
-    return res.json({
+    return res.status(400).json({
       msg: "invalid input",
+      validation,
     });
   }
 
   const existingUser = await User.findOne({ username: req.body.username });
 
   if (existingUser) {
-    return res.json({
+    return res.status(409).json({
       msg: "username already taken!",
     });
   }
@@ -92,7 +93,7 @@ router.post("/signin", async function (req, res) {
   const { success } = signinValidationSchema.safeParse(req.body);
 
   if (!success) {
-    return res.status(201).json({
+    return res.status(400).json({
       msg: "Invalid Input",
     });
   }
@@ -101,7 +102,7 @@ router.post("/signin", async function (req, res) {
     const findUser = await User.findOne({ username: req.body.username });
 
     if (!findUser)
-      return res.status(201).json({
+      return res.status(404).json({
         msg: "Username not found",
       });
 
@@ -110,7 +111,7 @@ router.post("/signin", async function (req, res) {
       findUser.password
     );
     if (!passwordMatch) {
-      return res.status(400).json({
+      return res.status(401).json({
         msg: "Password does not match",
       });
     }
@@ -139,8 +140,10 @@ router.post("/signin", async function (req, res) {
 
 // get users
 
-router.get("/bulk", async function (req, res) {
+router.get("/bulk", authMiddleware, async function (req, res) {
   const filter = req.query.filter || "";
+
+  console.log(req.userId);
 
   const users = await User.find({
     $or: [
@@ -158,13 +161,14 @@ router.get("/bulk", async function (req, res) {
   });
 
   res.status(200).json({
-    users: users.map((user) => {
-      return {
-        username: user.username,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        _id: user._id,
-      };
+    users: users.filter((user) => {
+      if (req.username !== user.username)
+        return {
+          username: user.username,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          _id: user._id,
+        };
     }),
   });
 });

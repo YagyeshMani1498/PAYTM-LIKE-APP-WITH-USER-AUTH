@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { BottomWarning } from "../components/BottomWarning";
 import { ButtonComponent } from "../components/ButtonComponent";
@@ -8,31 +9,37 @@ import { useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
-export function Singin() {
+export function Singin({ toast }) {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  async function singInFuntion() {
-    try {
-      const responce = await axios.post(
+  function singInFuntion() {
+    axios
+      .post(
         "https://congenial-spork-45vxjvq4v44hqjx6-3000.app.github.dev/api/v1/user/signin",
         {
           username,
           password,
         }
-      );
-
-      if (responce.status !== 200) {
-        console.log("");
-      } else {
-        const authToken = responce.data.token;
+      )
+      .then(function (response) {
+        response.status === 200 && toast.success("Signed in successfully");
+        const authToken = response.data.token;
         localStorage.setItem("JWT-Token", authToken);
-        navigate(`/dashboard?name=${responce.data.firstName.split(" ")[0]}`);
-      }
-    } catch (err) {
-      console.error(err);
-    }
+        navigate(`/dashboard?name=${response.data.firstName.split(" ")[0]}`);
+      })
+      .catch(function (error) {
+        error.response.status === 400
+          ? toast.error("Please fill the input fields correctly!")
+          : error.response.status === 404
+          ? toast.error("Username does not exist!")
+          : error.response.status === 401
+          ? toast.error("Incorrect password!")
+          : error.response.status === 500
+          ? toast.error("Somthing went wronge!")
+          : null;
+      });
   }
 
   return (
@@ -48,7 +55,7 @@ export function Singin() {
         />
         <InputBox
           label="Password"
-          placeholder="123456"
+          placeholder="Must be 8 characters long"
           id="password"
           onChange={(e) => setPassword(e.target.value)}
         />
