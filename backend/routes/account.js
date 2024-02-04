@@ -1,7 +1,7 @@
 const express = require("express");
 const z = require("zod");
 const authMiddleware = require("../middleware");
-const { Account } = require("../database/Schema");
+const { Account, User } = require("../database/Schema");
 const mongoose = require("mongoose");
 const router = express.Router();
 
@@ -37,6 +37,8 @@ router.post("/transfer", authMiddleware, async function (req, res) {
   }
 
   try {
+    const senderUserInfo = await User.findOne({ username: req.username });
+
     const session = await mongoose.startSession();
 
     session.startTransaction();
@@ -81,6 +83,7 @@ router.post("/transfer", authMiddleware, async function (req, res) {
 
     res.status(200).json({
       msg: "Transaction successfully",
+      userInfo: senderUserInfo.firstName,
     });
   } catch (err) {
     console.log(err);
