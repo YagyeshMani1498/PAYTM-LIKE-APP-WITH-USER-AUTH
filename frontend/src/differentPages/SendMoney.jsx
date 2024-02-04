@@ -1,14 +1,17 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
 import { Heading } from "../components/HeadingComponent";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import axios from "axios";
 
 export function SendMoney({ toast }) {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
   const name = searchParams.get("name");
   const [inputValue, setInputValue] = useState("");
+
+  let dashboardRedirect;
 
   function transferMoney() {
     axios
@@ -26,7 +29,8 @@ export function SendMoney({ toast }) {
       )
       .then(function (response) {
         response.status === 200 && toast.success("Transaction Successfull");
-        console.log(response);
+        dashboardRedirect = response.data.userInfo;
+        navigate(`/dashboard?name=${dashboardRedirect}`);
         setInputValue("");
       })
       .catch(function (error) {
