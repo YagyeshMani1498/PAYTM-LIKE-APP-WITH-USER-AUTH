@@ -246,6 +246,11 @@ body {
   justify-content: space-between;
 }
 
+.user-display-field {
+  max-height: 10rem;
+  overflow-y: scroll;
+}
+
 .user-name {
   display: flex;
   gap: 0.5rem;

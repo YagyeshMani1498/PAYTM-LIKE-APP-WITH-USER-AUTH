@@ -19,8 +19,8 @@ const router = express.Router();
 const signupValidationSchema = z.object({
   username: z.string().email(),
   password: z.string().min(8),
-  firstName: z.string().min(5),
-  lastName: z.string().min(5),
+  firstName: z.string(),
+  lastName: z.string(),
 });
 
 router.post("/signup", async function (req, res) {
